@@ -1,0 +1,19 @@
+{
+	"cards": [{
+		"drafts": [false, true, false, true, false, true, false, true],
+		"oracle_blessing": "You can play an additional Special Action this turn."
+	},{
+		"drafts": [false, true, true, false, false, true, false, true],
+		"oracle_blessing": "Add 1 more Priest to your Priest Pool, start a Blessing Draft."
+	},{
+		"drafts": [false, true, true, false, true, false, true, false],
+		"oracle_blessing": "Draw 3 Neutral Artifacts, keep one and shuffle others back."
+	},{
+		"drafts": [false, false, true, true, true, false, true, false],
+		"oracle_blessing": "Draw Combat Cards up to your Combat Cards limit."
+	},{
+		"drafts": [false, false, true, true, false, true, true, false],
+		"oracle_blessing": "Permanently raise 2 different Attributes by 1."
+	}]
+}
+
