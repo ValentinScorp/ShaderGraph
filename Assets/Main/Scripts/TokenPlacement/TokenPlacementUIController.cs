@@ -15,6 +15,7 @@ public class TokenPlacementUIController
     public void ShowPanel(bool show) => _panel.SetActive(show);
 
     public TokenPlacementUIController(GameObject panel) {
+        Debug.Log("TokenPlacementUIController constructor");
         _panel = panel ?? throw new ArgumentNullException(nameof(panel));
         BindButtons();
         ShowPanel(false);
@@ -50,6 +51,8 @@ public class TokenPlacementUIController
         _buttonActionBinder.InteractableButtonByButtonName(buttonName, interactable);
     }
     public void UnbindAllButtons() {
+        Debug.Log("TokenPlacementUIController UnbindAllButtons");
+
         _buttonActionBinder.UnbindAll();
     }
 }

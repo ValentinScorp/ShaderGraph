@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -30,8 +31,12 @@ public class TokenPlacementManager : MonoBehaviour
     private RaycastIntersector _raycastIntersector;
 
     void Awake() {
+        Debug.Log("TokenPlacementManager Awake, new UiController");
+
         _boardLayerMask = 1 << LayerMask.NameToLayer("BoardSurface");
-        _uiController = new TokenPlacementUIController(_tokenPlacementControl_Panel);
+        if (_uiController == null) {
+            _uiController = new TokenPlacementUIController(_tokenPlacementControl_Panel);
+        }
 
         _tokenHolder = new TokenHolder();
         _tokenVisualChanger = new TokenVisualChanger(_colorPalette);
@@ -42,25 +47,33 @@ public class TokenPlacementManager : MonoBehaviour
     }
 
     private void OnEnable() {
+        Debug.Log("TokenPlacementManager OnEnable");
+
         _userInputController.OnMouseClick += HandleMouseClick;
         _uiController.OnStartPlacement += StartPlacingToken;
         _uiController.OnFinalizePlacement += FinalizePlacement;
         _uiController.OnCancelPlacement += CancelPlacement;
     }
 
+    public void InitiatePlacing(Player player, int heroesCount, int hoplitesCount) {
+        Debug.Log("TokenPlacementManager InitiatePlacing");
+
+        _player = player;
+        _uiController.ShowPanel(true);
+        _tokenPlacementTracker.SetPlacementTargets(heroesCount, hoplitesCount);
+        _uiController.UpdateButtonInteractability(_tokenPlacementTracker);
+    }
+
     private void OnDisable() {
+        Debug.Log("TokenPlacementManager OnDisable");
+
         _userInputController.OnMouseClick -= HandleMouseClick;
         _uiController.OnStartPlacement -= StartPlacingToken;
         _uiController.OnFinalizePlacement -= FinalizePlacement;
         _uiController.OnCancelPlacement -= CancelPlacement;
     }
 
-    public void InitiatePlacing(Player player, int heroesCount, int hoplitesCount) {
-        _player = player;
-        _uiController.ShowPanel(true);
-        _tokenPlacementTracker.SetPlacementTargets(heroesCount, hoplitesCount);
-        _uiController.UpdateButtonInteractability(_tokenPlacementTracker);
-    }
+    
     private void HandleMouseClick() {
         if (!_raycastIntersector.IsPointerOverUI()) {
             ReleaseObject();
@@ -121,7 +134,8 @@ public class TokenPlacementManager : MonoBehaviour
     }
 
     private void OnDestroy() {
+        Debug.Log("TokenPlacementManager OnDestroy");
         _uiController.UnbindAllButtons();
-        _uiController = null;
+        //_uiController = null;
     }
 }

@@ -26,6 +26,8 @@ public class GameManager : MonoBehaviour
     public RegionManager RegionManager => _regionManager;
 
     private void Awake() {
+        Debug.Log("GameManager Awake");
+
         _gameContext = GetComponent<GameContext>();
         _regionManager = _regions.GetComponent<RegionManager>();
         _regionVisuals = _regions.GetComponent<RegionManagerVisuals>();
@@ -38,6 +40,8 @@ public class GameManager : MonoBehaviour
     }
 
     private void Start() {
+        Debug.Log("GameManager Start");
+
         _gameContext.InitializeDecks(GetComponent<CardLoader>());
 
         Player player1 = new Player(PlayerColor.Blue, new Hero("Achilles", PlayerColor.Blue));
@@ -53,12 +57,12 @@ public class GameManager : MonoBehaviour
         _tokenPlacementManager.OnPlacementFinished += HandlePlacementFinished;
         DisablePlacementUI();
 
-        _tokenPlacementManager.InitiatePlacing(_gamePhaseHeroesPlacement.GetActivePlayer(), 1, 2);
     }
 
     private void EnablePlacementUI() {
         _tokenPlacementOnStart_Panel.SetActive(true);
         _startPlacement_Button.interactable = false;
+        _tokenPlacementManager.InitiatePlacing(_gamePhaseHeroesPlacement.GetActivePlayer(), 1, 2);
     }
 
     private void DisablePlacementUI() {
@@ -91,8 +95,6 @@ public class GameManager : MonoBehaviour
         return false;
     }
     private void HandlePlacementFinished(List<TokenPlacementInfo> placedTokens) {
-        Debug.Log("Finish Placement" + placedTokens.Count);
-
         foreach (var token in placedTokens) {
             //Debug.Log($"Token of type {token.TokenType} placed in region {token.RegionId}");
             switch (token.TokenType) {
@@ -145,6 +147,8 @@ public class GameManager : MonoBehaviour
     }
 
     private void OnDestroy() {
+        Debug.Log("GameManager OnDestroy");
+
         if (_startPlacement_Button != null) {
             _startPlacement_Button.onClick.RemoveListener(EnablePlacementUI);
         }
