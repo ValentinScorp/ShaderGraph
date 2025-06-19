@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
     public RegionManager RegionManager => _regionManager;
 
     private void Awake() {
-        Debug.Log("GameManager Awake");
+        //Debug.Log("GameManager Awake");
 
         _gameContext = GetComponent<GameContext>();
         _regionManager = _regions.GetComponent<RegionManager>();
@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour
     }
 
     private void Start() {
-        Debug.Log("GameManager Start");
+        //Debug.Log("GameManager Start");
 
         _gameContext.InitializeDecks(GetComponent<CardLoader>());
 
@@ -147,7 +147,7 @@ public class GameManager : MonoBehaviour
     }
 
     private void OnDestroy() {
-        Debug.Log("GameManager OnDestroy");
+        //Debug.Log("GameManager OnDestroy");
 
         if (_startPlacement_Button != null) {
             _startPlacement_Button.onClick.RemoveListener(EnablePlacementUI);

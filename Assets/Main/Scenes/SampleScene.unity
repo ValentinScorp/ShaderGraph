@@ -2115,13 +2115,14 @@ GameObject:
   - component: {fileID: 744716986}
   - component: {fileID: 744716985}
   - component: {fileID: 744716984}
+  - component: {fileID: 744716987}
   m_Layer: 5
   m_Name: TokenPlacementControl_Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &744716982
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2195,6 +2196,23 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &744716987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 744716981}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 768e6a786ed3ed448a1277668e6f8d93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  panel: {fileID: 744716981}
+  placeHeroButton: {fileID: 828486418}
+  placeHopliteButton: {fileID: 2060706793}
+  okPlacingButton: {fileID: 455594917}
+  cancelButton: {fileID: 103419459}
 --- !u!1 &756044386
 GameObject:
   m_ObjectHideFlags: 0
@@ -5129,7 +5147,7 @@ MonoBehaviour:
   _regionManager: {fileID: 912145882}
   _colorPalette: {fileID: 11400000, guid: 9a1aa5562c8aed144a1f55256ffcfcc0, type: 2}
   _boardSurface: {fileID: 1211828454}
-  _tokenPlacementControl_Panel: {fileID: 744716981}
+  _uiController: {fileID: 744716987}
   _userInputController: {fileID: 756044389}
   Radius: 1
 --- !u!114 &1641279534

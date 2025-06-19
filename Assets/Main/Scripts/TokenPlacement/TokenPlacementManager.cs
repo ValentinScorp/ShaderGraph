@@ -11,14 +11,15 @@ public class TokenPlacementManager : MonoBehaviour
     [SerializeField] private ColorPalette _colorPalette;
     [SerializeField] private TokenFactory _tokenFactory;
     [SerializeField] private GameObject _boardSurface;
-    [SerializeField] private GameObject _tokenPlacementControl_Panel;
+    //[SerializeField] private GameObject _tokenPlacementControl_Panel;
+    [SerializeField] private TokenPlacementUIController _uiController;
     private readonly TokenPlacementTracker _tokenPlacementTracker = new();
 
     [SerializeField] private UserInputController _userInputController;
 
     private TokenHolder _tokenHolder;
     private TokenVisualChanger _tokenVisualChanger;
-    private TokenPlacementUIController _uiController = null;
+    //private TokenPlacementUIController _uiController = null;
 
     private TokenPlacementValidator _tokenPlacementValidator;
     public event Action<List<TokenPlacementInfo>> OnPlacementFinished;
@@ -31,12 +32,12 @@ public class TokenPlacementManager : MonoBehaviour
     private RaycastIntersector _raycastIntersector;
 
     void Awake() {
-        Debug.Log("TokenPlacementManager Awake, new UiController");
+        //Debug.Log("TokenPlacementManager Awake, new UiController");
 
         _boardLayerMask = 1 << LayerMask.NameToLayer("BoardSurface");
-        if (_uiController == null) {
+        /*if (_uiController == null) {
             _uiController = new TokenPlacementUIController(_tokenPlacementControl_Panel);
-        }
+        }*/
 
         _tokenHolder = new TokenHolder();
         _tokenVisualChanger = new TokenVisualChanger(_colorPalette);
@@ -47,7 +48,7 @@ public class TokenPlacementManager : MonoBehaviour
     }
 
     private void OnEnable() {
-        Debug.Log("TokenPlacementManager OnEnable");
+        //Debug.Log("TokenPlacementManager OnEnable");
 
         _userInputController.OnMouseClick += HandleMouseClick;
         _uiController.OnStartPlacement += StartPlacingToken;
@@ -56,24 +57,40 @@ public class TokenPlacementManager : MonoBehaviour
     }
 
     public void InitiatePlacing(Player player, int heroesCount, int hoplitesCount) {
-        Debug.Log("TokenPlacementManager InitiatePlacing");
+        //Debug.Log("TokenPlacementManager InitiatePlacing");
 
         _player = player;
         _uiController.ShowPanel(true);
         _tokenPlacementTracker.SetPlacementTargets(heroesCount, hoplitesCount);
         _uiController.UpdateButtonInteractability(_tokenPlacementTracker);
     }
+    void Update() {
+        if (!_tokenHolder.HasObject) {
+            return;
+        }
+        if (_raycastIntersector.TryGetBoardPosition(Input.mousePosition, out Vector3 newPosition)) {
+            if (_tokenHolder.GetTokenPosition() != newPosition) {
+                _tokenHolder.SetTokenPosition(newPosition);
 
-    private void OnDisable() {
-        Debug.Log("TokenPlacementManager OnDisable");
-
-        _userInputController.OnMouseClick -= HandleMouseClick;
-        _uiController.OnStartPlacement -= StartPlacingToken;
-        _uiController.OnFinalizePlacement -= FinalizePlacement;
-        _uiController.OnCancelPlacement -= CancelPlacement;
+                var state = _tokenPlacementValidator.ValidatePlacement(newPosition);
+                _tokenVisualChanger.SetTokenMaterialGhostState(_tokenHolder.CurrentObject, state);
+            }
+        }
     }
-
-    
+    public void ReleaseObject() {
+        if (_tokenHolder.HasObject && _tokenPlacementValidator.IsCurrentStateAllowed) {
+            var position = _tokenHolder.GetTokenPosition();
+            if (_tokenPlacementValidator.TryGetRegionIdAtPosition(position, out RegionId regionId)) {
+                _tokenPlacementTracker.CountToken(_tokenHolder.TokenType);
+                _tokenVisualChanger.PrepareTokenPlacement(_tokenHolder.CurrentObject, _player.Color);
+                _tokenHolder.CacheCurrentToken(_player.Color, regionId);
+                _tokenHolder.ReleaseToken();
+                _uiController.UpdateButtonInteractability(_tokenPlacementTracker);
+            }
+        } else {
+            Debug.Log("Can't place");
+        }
+    }
     private void HandleMouseClick() {
         if (!_raycastIntersector.IsPointerOverUI()) {
             ReleaseObject();
@@ -90,10 +107,8 @@ public class TokenPlacementManager : MonoBehaviour
             _tokenPlacementValidator.SetTokenRadius(radius);
         }
     }
-    private void FinalizePlacement() {
-        if (_tokenHolder?.HasObject == true) {
-            _tokenHolder.DestroyObject();
-        }
+    private void FinalizePlacement() {        
+        _tokenHolder.OnOkPlacing();
 
         _uiController?.ShowPanel(false);
         OnPlacementFinished?.Invoke(_tokenHolder.PlacedTokens);
@@ -104,38 +119,18 @@ public class TokenPlacementManager : MonoBehaviour
         _uiController.ShowPanel(true);
         _tokenPlacementTracker.Reset();
         _uiController.UpdateButtonInteractability(_tokenPlacementTracker);
-    }
-    void Update() {
-        if (!_tokenHolder.HasObject) {
-            return;
-        }
-        if (_raycastIntersector.TryGetBoardPosition(Input.mousePosition, out Vector3 newPosition)) {
-            if (_tokenHolder.GetTokenPosition() != newPosition) {
-                _tokenHolder.SetTokenPosition(newPosition);
-
-                var state = _tokenPlacementValidator.ValidatePlacement(newPosition);
-                _tokenVisualChanger.SetTokenMaterialGhostState(_tokenHolder.CurrentObject, state);                
-            }
-        }
     }    
-    public void ReleaseObject() {
-        if (_tokenHolder.HasObject && _tokenPlacementValidator.IsCurrentStateAllowed) {
-            var position = _tokenHolder.GetTokenPosition();
-            if (_tokenPlacementValidator.TryGetRegionIdAtPosition(position, out RegionId regionId)) {
-                _tokenPlacementTracker.CountToken(_tokenHolder.TokenType);
-                _tokenVisualChanger.PrepareTokenPlacement(_tokenHolder.CurrentObject, _player.Color);
-                _tokenHolder.CacheCurrentToken(_player.Color, regionId);
-                _tokenHolder.ReleaseToken();
-                _uiController.UpdateButtonInteractability(_tokenPlacementTracker);
-            }
-        } else {
-            Debug.Log("Can't place");
-        }
+    private void OnDisable() {
+        //Debug.Log("TokenPlacementManager OnDisable");
+
+        _userInputController.OnMouseClick -= HandleMouseClick;
+        _uiController.OnStartPlacement -= StartPlacingToken;
+        _uiController.OnFinalizePlacement -= FinalizePlacement;
+        _uiController.OnCancelPlacement -= CancelPlacement;
     }
 
     private void OnDestroy() {
-        Debug.Log("TokenPlacementManager OnDestroy");
+        //Debug.Log("TokenPlacementManager OnDestroy");
         _uiController.UnbindAllButtons();
-        //_uiController = null;
     }
 }

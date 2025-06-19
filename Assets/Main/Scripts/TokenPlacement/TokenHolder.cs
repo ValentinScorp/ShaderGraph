@@ -27,25 +27,18 @@ public class TokenHolder
     public void InitPalcement(GameObject gameObject, TokenType tokenType) {
         _currentObject = gameObject;
         _tokenType = tokenType;
-    }
-    public void Reset() {
-        _placedTokens.Clear();
-    }
-    public void DestroyTokens() {
-        foreach (var token in _placedTokens) {
-            if (token.TokenObject != null) {
-                Object.Destroy(token.TokenObject);
-            }
-        }
-        _placedTokens.Clear();
-    }
+    }    
     public void CacheCurrentToken(PlayerColor color, RegionId regionId) {
         _placedTokens.Add(new TokenPlacementInfo(_currentObject, color, regionId, _tokenType));
     }
+    public void OnOkPlacing() {
+        DestroyObject();
+        ClearPlacedTokensBuffer();
+    }
     public void OnCancelPlacing() {
         DestroyObject();
-        DestroyTokens();
-        Reset();
+        DestroyPlacedTokens();
+        ClearPlacedTokensBuffer();
     }
     public void ReleaseToken() {
         if(HasObject) {
@@ -55,13 +48,23 @@ public class TokenHolder
             Debug.LogWarning("Unable to place empty object!");
         }
     }
-    public void DestroyObject() {
+    private void DestroyObject() {
         if (HasObject) {
+            Debug.LogWarning("Destroing object in TokenHolder!");
             Object.Destroy(_currentObject);
             _currentObject = null;
             _tokenType = TokenType.None;
-        } else {
-            Debug.LogWarning("Unable to Destroy empty object!");
+        } 
+    }
+    private void DestroyPlacedTokens() {
+        foreach (var token in _placedTokens) {
+            if (token.TokenObject != null) {
+                Object.Destroy(token.TokenObject);
+            }
         }
+        _placedTokens.Clear();
+    }
+    private void ClearPlacedTokensBuffer() {
+        _placedTokens.Clear();
     }
 }
