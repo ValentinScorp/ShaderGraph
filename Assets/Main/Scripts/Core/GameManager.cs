@@ -69,6 +69,30 @@ public class GameManager : MonoBehaviour
         _tokenPlacementOnStart_Panel.SetActive(false);
         _startPlacement_Button.interactable = true;
     }
+
+    public bool TryRegisterTokenAt(TokenPlacementInfo tokenPlacementInfo) {
+        if (tokenPlacementInfo.RegionId != RegionId.Unknown) {
+            switch(tokenPlacementInfo.TokenType) {
+                case TokenType.Hoplite:
+                    _regionManager.PlaceHopliteAt(tokenPlacementInfo.RegionId, tokenPlacementInfo.PlayerColor);
+                    break;
+                case TokenType.Hero:
+                    _regionManager.PlaceHeroAt(tokenPlacementInfo.RegionId, new Hero("Hero_name", tokenPlacementInfo.PlayerColor));
+                    break;
+                default: 
+                    Debug.LogError("Unknown token type at GameManager::TryRegisterTokenAt!");
+                    return false;
+            }
+
+            _regionVisuals.PlaceGameObjectAt(tokenPlacementInfo.RegionId, tokenPlacementInfo.TokenObject);
+
+            _gameLog.AddLogEntry($"Addin Hoplite to {tokenPlacementInfo.RegionId}");
+            return true;
+        } else {
+            Debug.LogWarning("Error in {GameManager} {RegisterHopliteAt}");
+        }
+        return false;
+    }
     public bool TryRegisterHopliteAt(TokenPlacementInfo tokenInfo) {
         if (tokenInfo.RegionId != RegionId.Unknown) {
             _regionManager.PlaceHopliteAt(tokenInfo.RegionId, tokenInfo.PlayerColor);
